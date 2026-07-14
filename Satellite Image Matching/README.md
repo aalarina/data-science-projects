@@ -1,4 +1,4 @@
-# data-science-projects
+# Satellite Image Matching
 
 ## Future Improvements
 Cloud masks supplied with Sentinel-2 products could be used
