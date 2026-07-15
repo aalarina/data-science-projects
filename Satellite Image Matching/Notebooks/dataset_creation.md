@@ -1,7 +1,3 @@
-{
-      "cell_type": "code",
-      "execution_count": null,
-      "source": {
 ```python
 folders = glob.glob("/content/S2*")
 
@@ -120,4 +116,3 @@ for idx, row in pairs_df.iterrows():
 
 print("Dataset created!")
 ```
-}}
