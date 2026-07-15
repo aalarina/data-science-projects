@@ -23,22 +23,21 @@ from tqdm import tqdm
 # Image loading
 # ============================================================
 
-def read_rgb(path: Path):
+def read_rgb(image_path):
     """
-    Read Sentinel-2 TCI image.
+    Read Sentinel-2 RGB image (TCI.jp2).
 
     Parameters
     ----------
-    path : Path
+    image_path --- Path to the RGB Sentinel-2 image.
 
     Returns
     -------
-    numpy.ndarray
-        RGB image.
+    numpy.ndarray --- RGB image as uint8 numpy array.
     """
 
-    with rasterio.open(path) as src:
-        image = src.read([1, 2, 3])
+    with rasterio.open(image_path) as src:
+        image = src.read()
 
     image = np.moveaxis(image, 0, -1)
 
@@ -55,12 +54,19 @@ def split_image_into_tiles(image, tile_size=1024):
 
     Parameters
     ----------
-    image : ndarray
-    tile_size : int
+    image --- Input RGB image.
+    tile_size --- Tile size in pixels.
 
     Returns
     -------
-    list
+    list --- List of dictionaries.
+
+        Each dictionary contains:
+        {
+            "image": tile,
+            "x": x_offset,
+            "y": y_offset
+        }
     """
 
     h, w = image.shape[:2]
@@ -81,12 +87,47 @@ def split_image_into_tiles(image, tile_size=1024):
 
 
 # ============================================================
-# LoFTR matching
+# LoFTR initialization
 # ============================================================
 
-def match_tile_pair(tileA, tileB, matcher, device):
+def load_matcher(device):
     """
-    Match one tile pair using LoFTR.
+    Load the pretrained LoFTR model.
+
+    Parameters
+    ----------
+    device --- Device used for inference (CPU or CUDA).
+
+    Returns
+    -------
+    KF.LoFTR --- Initialized LoFTR model.
+    """
+
+    matcher = KF.LoFTR(pretrained="outdoor").to(device)
+
+    matcher.eval()
+
+    return matcher
+
+
+# ============================================================
+# Tile matching
+# ============================================================
+
+def match_single_tile(tileA, tileB, matcher, device):
+    """
+    Match two image tiles using LoFTR.
+
+    Parameters
+    ----------
+    tileA --- First RGB tile.
+    tileB ---Second RGB tile.
+    matcher --- Initialized LoFTR model.
+    device --- Device used for inference.
+
+    Returns
+    -------
+    dict --- Dictionary containing LoFTR correspondences.
     """
 
     grayA = cv2.cvtColor(tileA, cv2.COLOR_RGB2GRAY)
@@ -112,18 +153,27 @@ def match_tile_pair(tileA, tileB, matcher, device):
 
 
 # ============================================================
-# Whole image matching
+# Full image matching
 # ============================================================
 
 def match_image_pair(tilesA, tilesB, matcher, device):
     """
-    Match all corresponding tiles.
+    Match all corresponding image tiles.
+    
+    Each tile is processed independently using the pretrained
+    LoFTR model. Local keypoints are converted into global
+    image coordinates before being merged.
+
+    Parameters
+    ----------
+    tilesA --- Tiles from the first image.
+    tilesB --- Tiles from the second image.
+    matcher --- Initialized LoFTR model.
+    device --- Device used for inference.
 
     Returns
     -------
-    keypoints0
-    keypoints1
-    confidence
+    tuple --- (keypoints0, keypoints1, confidence)
     """
 
     all_keypoints0 = []
@@ -133,19 +183,23 @@ def match_image_pair(tilesA, tilesB, matcher, device):
     for tileA, tileB in tqdm(
             zip(tilesA, tilesB),
             total=len(tilesA),
-            desc="Matching tiles"):
+            desc="Matching image tiles"):
 
-        corr = match_tile_pair(
+        correspondences = match_single_tile(
             tileA["image"],
             tileB["image"],
             matcher,
             device
         )
 
-        kp0 = corr["keypoints0"].cpu().numpy()
-        kp1 = corr["keypoints1"].cpu().numpy()
-        conf = corr["confidence"].cpu().numpy()
+        kp0 = correspondences["keypoints0"].cpu().numpy()
+        kp1 = correspondences["keypoints1"].cpu().numpy()
+        conf = correspondences["confidence"].cpu().numpy()
 
+        # Skip tiles where no correspondences were found
+        if len(conf) == 0:
+            continue
+            
         # Convert local tile coordinates
         # into global image coordinates
 
@@ -159,55 +213,79 @@ def match_image_pair(tilesA, tilesB, matcher, device):
         all_keypoints1.append(kp1)
         all_confidence.append(conf)
 
-    return (
-        np.concatenate(all_keypoints0),
-        np.concatenate(all_keypoints1),
-        np.concatenate(all_confidence)
-    )
+    keypoints0 = np.concatenate(all_keypoints0)
+    keypoints1 = np.concatenate(all_keypoints1)
+    confidence = np.concatenate(all_confidence)
+
+    return keypoints0, keypoints1, confidence
 
 
 # ============================================================
 # Main algorithm
 # ============================================================
 
-def run_algorithm(pair_folder: Path):
+def run_matching(imageA_path, imageB_path, tile_size = 1024):
     """
-    Execute the complete image matching pipeline.
+    Run the complete Sentinel-2 image matching pipeline.
+
+    Pipeline:
+        - Read two RGB Sentinel-2 images.
+        - Split both images into tiles.
+        - Match every tile using LoFTR.
+
+    Parameters
+    ----------
+    imageA_path --- Path to the first image.
+    imageB_path --- Path to the second image.
+    tile_size --- Tile size used during matching.
+
+    Returns
+    -------
+    tuple
+        imgA 
+        imgB 
+        keypoints0 
+        keypoints1 
+        confidence
     """
 
-    imageA = read_rgb(pair_folder / "image_A.jp2")
-    imageB = read_rgb(pair_folder / "image_B.jp2")
-
-    tilesA = split_image_into_tiles(imageA)
-    tilesB = split_image_into_tiles(imageB)
+    # --------------------------------------------------------
+    # Select device
+    # --------------------------------------------------------
 
     device = torch.device(
         "cuda" if torch.cuda.is_available() else "cpu"
     )
 
-    matcher = KF.LoFTR(pretrained="outdoor").to(device)
-    matcher.eval()
+    # --------------------------------------------------------
+    # Load pretrained LoFTR
+    # --------------------------------------------------------
 
-    keypoints0, keypoints1, confidence = match_image_pair(
+    matcher = load_matcher(device)
+
+    # --------------------------------------------------------
+    # Read images
+    # --------------------------------------------------------
+
+    imgA = read_rgb(imageA_path)
+    imgB = read_rgb(imageB_path)
+
+    # --------------------------------------------------------
+    # Split images into tiles
+    # --------------------------------------------------------
+
+    tilesA = split_into_tiles(imgA, tile_size)
+    tilesB = split_into_tiles(imgB, tile_size)
+
+    # --------------------------------------------------------
+    # Match all tiles
+    # --------------------------------------------------------
+
+    keypoints0, keypoints1, confidence = match_all_tiles(
         tilesA,
         tilesB,
         matcher,
         device
     )
 
-    return keypoints0, keypoints1, confidence
-
-
-# ============================================================
-# Example
-# ============================================================
-
-if __name__ == "__main__":
-
-    dataset = Path("prepared_dataset")
-
-    pair = sorted(dataset.iterdir())[0]
-
-    kp0, kp1, conf = run_algorithm(pair)
-
-    print(f"Total matches: {len(conf)}")
+    return (imgA, imgB, keypoints0, keypoints1, confidence)
