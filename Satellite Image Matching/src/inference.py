@@ -5,8 +5,6 @@ import numpy as np
 
 from algorithm import run_matching
 
-PAIR_INDEX = 0
-
 CONFIDENCE_THRESHOLD = 0.8
 
 TOP_K = 100
