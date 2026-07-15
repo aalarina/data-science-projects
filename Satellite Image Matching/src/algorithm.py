@@ -156,7 +156,7 @@ def match_single_tile(tileA, tileB, matcher, device):
 # Full image matching
 # ============================================================
 
-def match_image_pair(tilesA, tilesB, matcher, device):
+def match_all_tiles(tilesA, tilesB, matcher, device):
     """
     Match all corresponding image tiles.
     
@@ -281,11 +281,6 @@ def run_matching(imageA_path, imageB_path, tile_size = 1024):
     # Match all tiles
     # --------------------------------------------------------
 
-    keypoints0, keypoints1, confidence = match_all_tiles(
-        tilesA,
-        tilesB,
-        matcher,
-        device
-    )
+    keypoints0, keypoints1, confidence = match_all_tiles(tilesA, tilesB, matcher, device)
 
     return (imgA, imgB, keypoints0, keypoints1, confidence)
