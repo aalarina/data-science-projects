@@ -48,7 +48,7 @@ def read_rgb(image_path):
 # Image tiling
 # ============================================================
 
-def split_image_into_tiles(image, tile_size=1024):
+def split_into_tiles(image, tile_size=1024):
     """
     Split image into non-overlapping tiles.
 
