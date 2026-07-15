@@ -105,3 +105,52 @@ def visualize_matches(
         plt.savefig(save_path, dpi=300)
 
     plt.show()
+
+
+def main():
+
+    pair = sorted(Path("prepared_dataset").iterdir())[0]
+
+    imgA = read_rgb(pair / "image_A.jp2")
+    imgB = read_rgb(pair / "image_B.jp2")
+
+    kp0, kp1, confidence = run_algorithm(pair)
+
+    print(f"Raw matches: {len(confidence)}")
+
+    kp0, kp1, confidence = filter_matches(
+        kp0,
+        kp1,
+        confidence,
+        threshold=0.8
+    )
+
+    print(f"Filtered matches: {len(confidence)}")
+
+    kp0, kp1, confidence = sort_matches(
+        kp0,
+        kp1,
+        confidence
+    )
+
+    kp0, kp1, confidence = keep_best_matches(
+        kp0,
+        kp1,
+        confidence,
+        top_k=100
+    )
+
+    Path("results").mkdir(exist_ok=True)
+
+    visualize_matches(
+        imgA,
+        imgB,
+        kp0,
+        kp1,
+        confidence,
+        save_path="results/matches.png"
+    )
+
+
+if __name__ == "__main__":
+    main()
