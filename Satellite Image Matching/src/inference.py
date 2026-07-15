@@ -9,6 +9,13 @@ CONFIDENCE_THRESHOLD = 0.8
 
 TOP_K = 100
 
+PAIR_INDEX = 0
+
+pair = sorted(Path("prepared_dataset").iterdir())[PAIR_INDEX]
+
+imageA_path = pair / "image_A.jp2"
+imageB_path = pair / "image_B.jp2"
+
 
 
 def filter_matches(keypoints0, keypoints1, confidence, threshold=0.8, top_k=100):
@@ -99,7 +106,7 @@ def visualize_matches(imgA, imgB, keypoints0, keypoints1, confidence):
     plt.show()
 
 
-imgA, imgB, kp0, kp1, conf = run_matching(imageA, imageB, matcher, device)
+imgA, imgB, kp0, kp1, conf = run_matching(imageA_path, imageB_path, matcher, device)
 
 kp0, kp1, conf = filter_matches(kp0, kp1, conf, CONFIDENCE_THRESHOLD, TOP_K = 100)
 
