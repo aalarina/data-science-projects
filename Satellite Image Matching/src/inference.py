@@ -11,7 +11,7 @@ TOP_K = 100
 
 PAIR_INDEX = 0
 
-pair = sorted(Path("prepared_dataset").iterdir())[PAIR_INDEX]
+pair = sorted(Path("/prepared_dataset").iterdir())[PAIR_INDEX]
 
 imageA_path = pair / "image_A.jp2"
 imageB_path = pair / "image_B.jp2"
