@@ -1,35 +1,66 @@
-pair = sorted(Path("/prepared_dataset").iterdir())[0]
+"""
+Satellite image matching algorithm based on the pretrained LoFTR model.
 
-imgA = read_rgb(pair/"image_A.jp2")
-imgB = read_rgb(pair/"image_B.jp2")
+Pipeline:
+1. Load Sentinel-2 image pair.
+2. Split images into tiles.
+3. Match each tile using LoFTR.
+4. Transform local coordinates into global image coordinates.
+5. Merge all matches.
+"""
 
-plt.figure(figsize=(16,8))
+from pathlib import Path
 
-plt.subplot(121)
+import cv2
+import numpy as np
+import rasterio
+import torch
+import kornia.feature as KF
+from tqdm import tqdm
 
-plt.imshow(imgA)
 
-plt.title("Image A")
+# ============================================================
+# Image loading
+# ============================================================
 
-plt.subplot(122)
+def read_rgb(path: Path):
+    """
+    Read Sentinel-2 TCI image.
 
-plt.imshow(imgB)
+    Parameters
+    ----------
+    path : Path
 
-plt.title("Image B")
+    Returns
+    -------
+    numpy.ndarray
+        RGB image.
+    """
 
-plt.show()
+    with rasterio.open(path) as src:
+        image = src.read([1, 2, 3])
 
-def split_into_tiles(image, tile_size=1024):
+    image = np.moveaxis(image, 0, -1)
+
+    return image
+
+
+# ============================================================
+# Image tiling
+# ============================================================
+
+def split_image_into_tiles(image, tile_size=1024):
     """
     Split image into non-overlapping tiles.
 
-    Returns:
-        tiles - list of dictionaries:
-        {
-            "image": tile,
-            "x": x_offset,
-            "y": y_offset
-        }
+    Parameters
+    ----------
+    image : ndarray
+    tile_size : int
+
+    Returns
+    -------
+    list
     """
 
     h, w = image.shape[:2]
@@ -37,26 +68,26 @@ def split_into_tiles(image, tile_size=1024):
     tiles = []
 
     for y in range(0, h - tile_size + 1, tile_size):
+
         for x in range(0, w - tile_size + 1, tile_size):
 
-            tile = image[
-                y:y + tile_size,
-                x:x + tile_size
-            ]
-
             tiles.append({
-                "image": tile,
+                "image": image[y:y+tile_size, x:x+tile_size],
                 "x": x,
                 "y": y
             })
 
     return tiles
 
-tilesA = split_into_tiles(imgA, tile_size=1024)
 
-tilesB = split_into_tiles(imgB, tile_size=1024)
+# ============================================================
+# LoFTR matching
+# ============================================================
 
-def match_single_tile(tileA, tileB, matcher, device):
+def match_tile_pair(tileA, tileB, matcher, device):
+    """
+    Match one tile pair using LoFTR.
+    """
 
     grayA = cv2.cvtColor(tileA, cv2.COLOR_RGB2GRAY)
     grayB = cv2.cvtColor(tileB, cv2.COLOR_RGB2GRAY)
@@ -69,7 +100,7 @@ def match_single_tile(tileA, tileB, matcher, device):
 
     with torch.no_grad():
 
-        corr = matcher({
+        correspondences = matcher({
 
             "image0": tensorA,
 
@@ -77,40 +108,34 @@ def match_single_tile(tileA, tileB, matcher, device):
 
         })
 
-    return corr
+    return correspondences
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-matcher = KF.LoFTR(pretrained="outdoor").to(device)
-matcher.eval()
+# ============================================================
+# Whole image matching
+# ============================================================
 
-corr = match_single_tile(
+def match_image_pair(tilesA, tilesB, matcher, device):
+    """
+    Match all corresponding tiles.
 
-    tilesA[0]["image"],
-
-    tilesB[0]["image"],
-
-    matcher,
-
-    device
-
-)
-
-from tqdm import tqdm
-
-def match_all_tiles(tilesA, tilesB, matcher, device):
+    Returns
+    -------
+    keypoints0
+    keypoints1
+    confidence
+    """
 
     all_keypoints0 = []
     all_keypoints1 = []
     all_confidence = []
 
     for tileA, tileB in tqdm(
-        zip(tilesA, tilesB),
-        total=len(tilesA),
-        desc="Matching tiles"
-    ):
+            zip(tilesA, tilesB),
+            total=len(tilesA),
+            desc="Matching tiles"):
 
-        corr = match_single_tile(
+        corr = match_tile_pair(
             tileA["image"],
             tileB["image"],
             matcher,
@@ -121,7 +146,9 @@ def match_all_tiles(tilesA, tilesB, matcher, device):
         kp1 = corr["keypoints1"].cpu().numpy()
         conf = corr["confidence"].cpu().numpy()
 
-        # Переводимо координати у глобальні
+        # Convert local tile coordinates
+        # into global image coordinates
+
         kp0[:, 0] += tileA["x"]
         kp0[:, 1] += tileA["y"]
 
@@ -139,3 +166,48 @@ def match_all_tiles(tilesA, tilesB, matcher, device):
     )
 
 
+# ============================================================
+# Main algorithm
+# ============================================================
+
+def run_algorithm(pair_folder: Path):
+    """
+    Execute the complete image matching pipeline.
+    """
+
+    imageA = read_rgb(pair_folder / "image_A.jp2")
+    imageB = read_rgb(pair_folder / "image_B.jp2")
+
+    tilesA = split_image_into_tiles(imageA)
+    tilesB = split_image_into_tiles(imageB)
+
+    device = torch.device(
+        "cuda" if torch.cuda.is_available() else "cpu"
+    )
+
+    matcher = KF.LoFTR(pretrained="outdoor").to(device)
+    matcher.eval()
+
+    keypoints0, keypoints1, confidence = match_image_pair(
+        tilesA,
+        tilesB,
+        matcher,
+        device
+    )
+
+    return keypoints0, keypoints1, confidence
+
+
+# ============================================================
+# Example
+# ============================================================
+
+if __name__ == "__main__":
+
+    dataset = Path("prepared_dataset")
+
+    pair = sorted(dataset.iterdir())[0]
+
+    kp0, kp1, conf = run_algorithm(pair)
+
+    print(f"Total matches: {len(conf)}")
