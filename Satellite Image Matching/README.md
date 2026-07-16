@@ -94,9 +94,9 @@ Two seasonal image pairs were evaluated.
 
 ### Example 1
 
-**12 February 2016 --> 30 August 2016**
+**12 February 2016 <--> 30 August 2016**
 
-(Winter --> Summer)
+(Winter <--> Summer)
 
 After confidence filtering:
 
@@ -112,9 +112,9 @@ This example represents a challenging winter-to-summer scenario with extensive s
 
 ### Example 2
 
-**18 March 2019 --> 15 August 2019**
+**18 March 2019 <--> 15 August 2019**
 
-(Spring --> Summer)
+(Spring <--> Summer)
 
 After confidence filtering:
 
