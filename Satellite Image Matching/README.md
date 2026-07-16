@@ -60,14 +60,31 @@ The proposed image matching pipeline consists of the following stages:
 
 ---
 
+## Model weights
+
+The project uses the pretrained **LoFTR Outdoor** model available from Kornia.
+
+Weights:
+- https://huggingface.co/kornia/loftr/blob/main/loftr_outdoor.ckpt
+
+The weights are downloaded automatically when executing:
+
+```python
+matcher = KF.LoFTR(pretrained="outdoor")
+```
+
+Therefore, no manual download of the model weights is required.
+
+---
+
 ## Running the project
 
 The script automatically:
 
-- loads one image pair,
-- runs the LoFTR matching pipeline,
-- filters low-confidence correspondences,
-- visualizes the strongest matches.
+- loads one image pair
+- runs the LoFTR matching pipeline
+- filters low-confidence correspondences
+- visualizes the strongest matches
 
 ---
 
@@ -89,7 +106,7 @@ After confidence filtering:
 | Mean confidence | **0.9106** |
 | Maximum confidence | **0.9998** |
 
-This example represents a challenging winter-to-summer scenario with extensive snow cover. Despite significant appearance changes, the proposed pipeline successfully identifies reliable correspondences between stable landscape structures.
+This example represents a challenging winter-to-summer scenario with extensive snow cover. Despite significant appearance changes, the proposed pipeline identifies reliable correspondences between stable landscape structures.
 
 ---
 
@@ -113,22 +130,24 @@ Compared to the winter example, this image pair contains substantially more visu
 
 ## Discussion
 
-The pretrained LoFTR model demonstrates strong robustness to seasonal appearance changes without any additional training.
+The proposed pipeline successfully matches Sentinel-2 images acquired during different seasons using the pretrained LoFTR Outdoor model.
 
-The algorithm successfully detects correspondences between Sentinel-2 images even when vegetation, illumination or snow cover differ considerably.
+The experimental evaluation demonstrates that the model remains robust to seasonal appearance changes, including variations in vegetation, illumination, and partial snow cover, without requiring additional training or fine-tuning.
 
-As expected, the matching quality decreases in homogeneous regions with limited visual texture, particularly in snow-covered areas.
+The spring-to-summer image pair produced substantially more reliable correspondences than the winter-to-summer pair, which can be explained by the greater amount of visual texture and fewer homogeneous regions. In contrast, extensive snow cover reduces the number of distinctive features available for matching, leading to fewer high-confidence correspondences.
+
+Overall, the obtained results indicate that the proposed pipeline is suitable for feature matching in Sentinel-2 imagery under varying seasonal conditions.
 
 ---
 
 ## Limitations
 
-Current limitations of the proposed pipeline include:
+The current implementation has several limitations:
 
-- fixed tile size (1024 × 1024)
-- independent processing of image tiles
-- no geometric verification (e.g., RANSAC) after LoFTR matching
-- no fine-tuning of the pretrained model on Sentinel-2 imagery
+- images are divided into fixed **1024 × 1024** non-overlapping tiles
+- image tiles are processed independently without interaction between neighboring tiles
+- no geometric verification (e.g., RANSAC) is applied after LoFTR matching
+- cloud-contaminated regions are not explicitly removed before matching
 
 ---
 
@@ -136,20 +155,20 @@ Current limitations of the proposed pipeline include:
 
 Several improvements could further increase the matching quality:
 
-- use overlapping tiles instead of non-overlapping ones
-- apply geometric verification (e.g. RANSAC)
-- fine-tune LoFTR on remote sensing imagery
+- use overlapping tiles to reduce boundary effects
+- apply geometric verification (e.g., RANSAC) to remove incorrect correspondences
+- fine-tune LoFTR
 - use cloud masks to exclude unreliable regions before keypoint detection
-- introduce adaptive tile sizes for memory-efficient inference
-
-Future work may include evaluating correspondence quality inside deforestation regions using the provided GeoJSON annotations.
+- implement adaptive tile sizes depending on available GPU memory
+- benchmark alternative feature matching models (e.g., LightGlue, SuperGlue and EfficientLoFTR) to identify the most effective solution for Sentinel-2 seasonal image matching
 
 ---
 
 ## Conclusion
 
-A complete satellite image matching pipeline based on the pretrained LoFTR model was successfully implemented.
+A complete image matching pipeline for Sentinel-2 satellite imagery was successfully implemented using the pretrained LoFTR Outdoor model.
+The project includes dataset preparation, tile-based matching, confidence-based filtering and visualization of the detected correspondences.
 
-The proposed approach supports Sentinel-2 imagery acquired during different seasons and demonstrates reliable matching performance without additional model training.
+The obtained results demonstrate that reliable image matching is possible even under significant seasonal appearance changes, while also highlighting the influence of snow cover and low-texture regions on the number of detected correspondences.
 
-The modular implementation allows the pipeline to be easily extended with more advanced post-processing or domain-specific fine-tuning in future work.
+The proposed implementation provides a solid baseline for future research and can be further extended with more advanced post-processing techniques or alternative deep feature matching models.
