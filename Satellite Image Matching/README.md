@@ -1,5 +1,17 @@
 # Satellite Image Matching
 
+## Limitations
+
+Current limitations of the proposed pipeline include:
+
+fixed tile size (1024 × 1024);
+independent processing of image tiles;
+no geometric verification (e.g., RANSAC) after LoFTR matching;
+no fine-tuning of the pretrained model on Sentinel-2 imagery.
+
+Future improvements may include overlapping tiles, post-processing using
+RANSAC, and training or fine-tuning LoFTR on remote sensing datasets.
+
 ## Future Improvements
 Cloud masks supplied with Sentinel-2 products could be used
 to exclude unreliable regions before keypoint detection,
