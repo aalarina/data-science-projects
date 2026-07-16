@@ -16,7 +16,7 @@ import numpy as np
 import rasterio
 import torch
 import kornia.feature as KF
-from tqdm import tqdm
+import tqdm
 
 
 # ============================================================
