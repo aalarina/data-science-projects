@@ -60,30 +60,7 @@ The proposed image matching pipeline consists of the following stages:
 
 ---
 
-## Installation
-
-Clone the repository
-
-```bash
-git clone ...
-cd ...
-```
-
-Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
----
-
 ## Running the project
-
-Run the inference script
-
-```bash
-python inference.py
-```
 
 The script automatically:
 
