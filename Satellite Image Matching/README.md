@@ -107,7 +107,7 @@ Unlike traditional feature detectors such as SIFT or ORB, LoFTR directly predict
 
 ---
 
-# Installation
+# Project Setup
 
 Clone the repository
 
