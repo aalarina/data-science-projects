@@ -23,8 +23,6 @@ Only **True Color Images (TCI)** stored as **JPEG2000 (.jp2)** files are used fo
 Dataset source:
 https://www.kaggle.com/datasets/isaienkov/deforestation-in-ukraine
 
----
-
 ### Dataset preparation
 
 The dataset preparation pipeline performs the following steps:
@@ -48,7 +46,6 @@ pair_YYYYMMDD_YYYYMMDD/
     metadata.json
 ```
 
----
 
 ## 2. Image Preprocessing
 
@@ -58,7 +55,6 @@ Instead of resizing the images, every scene is divided into **1024 × 1024** non
 
 This approach preserves the original spatial resolution while allowing efficient inference.
 
---- 
 
 ## 3. Image Matching
 
@@ -66,7 +62,6 @@ Each corresponding image tile is independently processed by the pretrained **LoF
 
 The detected local correspondences are transformed into global image coordinates before being merged into a single set of matches.
 
----
 
 ## 4. Post-processing
 
