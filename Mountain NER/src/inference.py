@@ -26,34 +26,6 @@ ner = pipeline(
 
 
 # ==================================================
-# Prediction
-# ==================================================
-
-def predict(text):
-    """
-    Predict mountain names in the input text.
-    """
-
-    predictions = ner(text)
-
-    print(text)
-    print()
-
-    if not predictions:
-        print("No mountains found.")
-        return
-
-    print("Detected mountains:")
-
-    for entity in predictions:
-
-        print(
-            f"- {entity['word']} "
-            f"(confidence={entity['score']:.3f})"
-        )
-
-
-# ==================================================
 # Merge WordPiece tokens
 # ==================================================
 
@@ -87,6 +59,31 @@ def merge_subwords(predictions):
             merged.append(pred.copy())
 
     return merged
+
+
+# ==================================================
+# Prediction
+# ==================================================
+
+def predict(text):
+    """
+    Detect mountain names in the input text.
+    """
+
+    predictions = merge_subwords(ner(text))
+
+    if not predictions:
+        print("No mountains found.")
+        return
+
+    print("Detected mountains:")
+
+    for entity in predictions:
+
+        print(
+            f"- {entity['word']} "
+            f"(confidence={entity['score']:.3f})"
+        )
 
 
 # ==================================================
