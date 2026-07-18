@@ -8,6 +8,8 @@ The objective is to identify reliable correspondences between two satellite imag
 
 ---
 
+## Solution Explanation
+
 ## Dataset
 
 The project uses the **Deforestation in Ukraine** dataset from Kaggle.
