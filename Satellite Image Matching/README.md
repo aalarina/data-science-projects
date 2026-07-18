@@ -10,7 +10,9 @@ The objective is to identify reliable correspondences between two satellite imag
 
 ## Solution Explanation
 
-## Dataset
+The proposed solution consists of four main stages.
+
+## 1. Dataset 
 
 The project uses the **Deforestation in Ukraine** dataset from Kaggle.
 
@@ -23,7 +25,7 @@ https://www.kaggle.com/datasets/isaienkov/deforestation-in-ukraine
 
 ---
 
-## Dataset preparation
+### Dataset preparation
 
 The dataset preparation pipeline performs the following steps:
 
@@ -48,17 +50,29 @@ pair_YYYYMMDD_YYYYMMDD/
 
 ---
 
-## Matching pipeline
+## 2. Image Preprocessing
 
-The proposed image matching pipeline consists of the following stages:
+Each Sentinel-2 image has a spatial resolution of **10980 × 10980 pixels**, which exceeds the available GPU memory during inference. 
 
-1. Read Sentinel-2 RGB images.
-2. Split large images into **1024 × 1024** non-overlapping tiles.
-3. Perform feature matching independently on every tile using the pretrained LoFTR model.
-4. Transform local tile coordinates into global image coordinates.
-5. Merge all detected correspondences.
-6. Filter correspondences by confidence score.
-7. Visualize the strongest matches.
+Instead of resizing the images, every scene is divided into **1024 × 1024** non-overlapping tiles. 
+
+This approach preserves the original spatial resolution while allowing efficient inference.
+
+--- 
+
+## 3. Image Matching
+
+Each corresponding image tile is independently processed by the pretrained **LoFTR** model.
+
+The detected local correspondences are transformed into global image coordinates before being merged into a single set of matches.
+
+---
+
+## 4. Post-processing
+
+The resulting correspondences are filtered according to their confidence score.
+
+Only high-confidence matches are retained and visualized.
 
 ---
 
@@ -79,14 +93,55 @@ Therefore, no manual download of the model weights is required.
 
 ---
 
-## Running the project
+# Why LoFTR?
+
+The pretrained **LoFTR Outdoor** model was selected for several reasons:
+
+- detector-free feature matching;
+- robustness to significant appearance changes;
+- state-of-the-art performance on outdoor image matching benchmarks;
+- publicly available pretrained weights;
+- suitability for large-scale satellite imagery without additional training.
+
+Unlike traditional feature detectors such as SIFT or ORB, LoFTR directly predicts dense correspondences using Transformer-based local feature aggregation, making it more robust to seasonal appearance variations.
+
+---
+
+# Installation
+
+Clone the repository
+
+```bash
+git clone <repository_url>
+
+cd <repository_name>
+```
+
+Install all required packages
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+---
+
+# Running the Project
+
+Run
+
+```bash
+python inference.py
+```
 
 The script automatically:
 
-- loads one image pair
-- runs the LoFTR matching pipeline
-- filters low-confidence correspondences
-- visualizes the strongest matches
+- loads one image pair;
+- splits both images into tiles;
+- performs LoFTR matching;
+- filters low-confidence correspondences;
+- visualizes the strongest matches.
 
 ---
 
