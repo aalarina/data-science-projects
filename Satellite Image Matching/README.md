@@ -16,12 +16,6 @@ The original dataset contains multiple Sentinel-2 spectral bands. However, this 
 
 The primary objective of the task is image matching rather than land cover classification or multispectral analysis. Since LoFTR is a feature matching model originally designed for RGB imagery, using TCI images provides a natural input format without requiring any architectural modifications.
 
-### Seasonal dataset construction 
-
-Instead of randomly pairing images, the dataset was intentionally constructed using image pairs acquired approximately six months apart (180 ± 30 days).
-
-This strategy creates significantly more challenging matching scenarios, as seasonal changes strongly affect vegetation, illumination conditions, snow cover and overall scene appearance.
-
 ### Confidence-based filtering
 
 LoFTR produces a confidence score for every detected correspondence.
