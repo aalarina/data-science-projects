@@ -1,1 +1,12 @@
-
+transformers==5.13.1
+datasets==4.0.0
+torch @ https://download.pytorch.org/whl/cpu/torch-2.11.0%2Bcpu-cp312-cp312-manylinux_2_28_x86_64.whl
+evaluate==0.4.6
+seqeval==1.2.2
+numpy==2.0.2
+pandas==2.2.2
+requests==2.32.4
+beautifulsoup4==4.13.5
+lxml==6.1.1
+ipython==7.34.0
+accelerate==1.14.0
