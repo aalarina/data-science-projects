@@ -181,6 +181,8 @@ After confidence filtering:
 
 Compared to the winter example, this image pair contains substantially more visual texture, resulting in a larger number of reliable correspondences and higher average confidence.
 
+Image comparing results are available in ```inference_demo.ipynb```.
+
 ---
 
 ## Discussion
