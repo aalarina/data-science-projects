@@ -8,6 +8,26 @@ The objective is to identify reliable correspondences between two satellite imag
 
 ---
 
+## Design choices
+
+### Choice of Sentinel-2 True Color Images
+
+The original dataset contains multiple Sentinel-2 spectral bands. However, this project utilizes only the True Color Image (TCI) representation.
+
+The primary objective of the task is image matching rather than land cover classification or multispectral analysis. Since LoFTR is a feature matching model originally designed for RGB imagery, using TCI images provides a natural input format without requiring any architectural modifications.
+
+### Seasonal dataset construction 
+
+Instead of randomly pairing images, the dataset was intentionally constructed using image pairs acquired approximately six months apart (180 ± 30 days).
+
+This strategy creates significantly more challenging matching scenarios, as seasonal changes strongly affect vegetation, illumination conditions, snow cover and overall scene appearance.
+
+### Confidence-based filtering
+
+LoFTR produces a confidence score for every detected correspondence.
+
+Instead of accepting every predicted match, only correspondences above a predefined confidence threshold are retained.
+
 ## Solution Explanation
 
 The proposed solution consists of four main stages.
