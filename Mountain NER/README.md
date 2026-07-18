@@ -76,6 +76,14 @@ Mountain-NER/
 
 ---
 
+## Model Weights
+
+The fine-tuned model weights are available on Hugging Face:
+
+https://huggingface.co/aalarina/mountain_ner_model
+
+---
+
 ## Project Setup
 
 Clone the repository.
