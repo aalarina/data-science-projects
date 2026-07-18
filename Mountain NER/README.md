@@ -1,4 +1,24 @@
-# Mountain NER
+# Mountain Named Entity Recognition
+
+## Project Overview
+
+## Dataset
+
+## Model
+
+## Training
+
+## Inference
+
+## Results
+
+## Project Structure
+
+## Installation
+
+## Limitations
+
+## Future Improvements
 
 ### Dataset generation
 
