@@ -32,11 +32,6 @@ The dataset creation pipeline consists of the following steps:
 - BIO annotations are created automatically by matching mountain names within each sentence;
 - the dataset is split into training, validation and test sets.
 
-**Natural language sentences were generated using ChatGPT.
-The generated sentences contain real mountain names in different contexts and writing styles.
-
-The model was fine-tuned on a custom synthetic NER dataset containing mountain entities. Text samples were generated using ChatGPT, while entity annotations were automatically created using Python rules based on a curated mountain list.**
-
 ### 2. Model Training
 
 The model is based on the pretrained **bert-base-cased** model from Hugging Face.
