@@ -204,14 +204,14 @@ training_args = TrainingArguments(
     eval_strategy="epoch",
     save_strategy="epoch",
 
-    learning_rate=2e-5,
+    learning_rate=LEARNING_RATE,
 
-    per_device_train_batch_size=8,
-    per_device_eval_batch_size=8,
+    per_device_train_batch_size=TRAIN_BATCH_SIZE,
+    per_device_eval_batch_size=EVAL_BATCH_SIZE,
 
-    num_train_epochs=5,
+    num_train_epochs=NUM_EPOCHS,
 
-    weight_decay=0.01,
+    weight_decay=WEIGHT_DECAY,
 
     # Restore the checkpoint with the best validation score.
     load_best_model_at_end=True,
@@ -255,8 +255,8 @@ trainer.train()
 # Save the trained model
 # --------------------------------------------------
 
-trainer.save_model("mountain_ner_model")
-tokenizer.save_pretrained("mountain_ner_model")
+trainer.save_model(MODEL_DIR)
+tokenizer.save_pretrained(MODEL_DIR)
 
 print("Model successfully saved.")
 
