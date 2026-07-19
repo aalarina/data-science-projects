@@ -85,7 +85,7 @@ Mountain-NER/
 Clone the repository.
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/aalarina/data-science-projects/blob/main/Mountain-NER 
 cd Mountain-NER
 ```
 
