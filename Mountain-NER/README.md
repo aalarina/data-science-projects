@@ -1,6 +1,6 @@
 # Mountain Named Entity Recognition
 
-## Project Overview
+## Overview
 
 This project implements a Named Entity Recognition (NER) system for detecting mountain names in English text.
 
