@@ -85,6 +85,20 @@ Only high-confidence matches are retained and visualized.
 
 ---
 
+## Why LoFTR?
+
+The pretrained **LoFTR Outdoor** model was selected for several reasons:
+
+- detector-free feature matching;
+- robustness to significant appearance changes;
+- state-of-the-art performance on outdoor image matching benchmarks;
+- publicly available pretrained weights;
+- suitability for large-scale satellite imagery without additional training.
+
+Unlike traditional feature detectors such as SIFT or ORB, LoFTR directly predicts dense correspondences using Transformer-based local feature aggregation, making it more robust to seasonal appearance variations.
+
+---
+
 ## Model weights
 
 The project uses the pretrained **LoFTR Outdoor** model available from Kornia.
@@ -99,20 +113,6 @@ matcher = KF.LoFTR(pretrained="outdoor")
 ```
 
 Therefore, no manual download of the model weights is required.
-
----
-
-## Why LoFTR?
-
-The pretrained **LoFTR Outdoor** model was selected for several reasons:
-
-- detector-free feature matching;
-- robustness to significant appearance changes;
-- state-of-the-art performance on outdoor image matching benchmarks;
-- publicly available pretrained weights;
-- suitability for large-scale satellite imagery without additional training.
-
-Unlike traditional feature detectors such as SIFT or ORB, LoFTR directly predicts dense correspondences using Transformer-based local feature aggregation, making it more robust to seasonal appearance variations.
 
 ---
 
@@ -246,14 +246,3 @@ Several improvements could further increase the matching quality:
 - use cloud masks to exclude unreliable regions before keypoint detection
 - implement adaptive tile sizes depending on available GPU memory
 - benchmark alternative feature matching models (e.g., LightGlue, SuperGlue and EfficientLoFTR) to identify the most effective solution for Sentinel-2 seasonal image matching
-
----
-
-## Conclusion
-
-A complete image matching pipeline for Sentinel-2 satellite imagery was successfully implemented using the pretrained LoFTR Outdoor model.
-The project includes dataset preparation, tile-based matching, confidence-based filtering and visualization of the detected correspondences.
-
-The obtained results demonstrate that reliable image matching is possible even under significant seasonal appearance changes, while also highlighting the influence of snow cover and low-texture regions on the number of detected correspondences.
-
-The proposed implementation provides a solid baseline for future research and can be further extended with more advanced post-processing techniques or alternative deep feature matching models.
