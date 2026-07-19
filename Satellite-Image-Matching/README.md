@@ -26,7 +26,7 @@ Instead of accepting every predicted match, only correspondences above a predefi
 
 The proposed solution consists of four main stages.
 
-## 1. Dataset 
+### 1. Dataset 
 
 The project uses the **Deforestation in Ukraine** dataset from Kaggle.
 
@@ -61,7 +61,7 @@ pair_YYYYMMDD_YYYYMMDD/
 ```
 
 
-## 2. Image Preprocessing
+### 2. Image Preprocessing
 
 Each Sentinel-2 image has a spatial resolution of **10980 × 10980 pixels**, which exceeds the available GPU memory during inference. 
 
@@ -70,14 +70,14 @@ Instead of resizing the images, every scene is divided into **1024 × 1024** non
 This approach preserves the original spatial resolution while allowing efficient inference.
 
 
-## 3. Image Matching
+### 3. Image Matching
 
 Each corresponding image tile is independently processed by the pretrained **LoFTR** model.
 
 The detected local correspondences are transformed into global image coordinates before being merged into a single set of matches.
 
 
-## 4. Post-processing
+### 4. Post-processing
 
 The resulting correspondences are filtered according to their confidence score.
 
