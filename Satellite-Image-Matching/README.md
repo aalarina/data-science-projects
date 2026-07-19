@@ -114,9 +114,9 @@ Satellite-Image-Matching/
 Clone the repository
 
 ```bash
-git clone <repository_url>
+git clone [<repository_url>](https://github.com/aalarina/data-science-projects/main/Satellite-Image-Matching)
 
-cd <repository_name>
+cd Satellite-Image-Matching
 ```
 
 Install all required packages
