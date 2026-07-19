@@ -236,7 +236,7 @@ The current implementation has several limitations:
 
 ---
 
-## Possible improvements
+## Future improvements
 
 Several improvements could further increase the matching quality:
 
