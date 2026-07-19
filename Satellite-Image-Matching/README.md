@@ -135,7 +135,7 @@ Satellite-Image-Matching/
 
 ---
 
-# Project Setup
+## Project Setup
 
 Clone the repository
 
