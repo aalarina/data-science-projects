@@ -61,12 +61,17 @@ The project also provides HTML visualization that highlights detected mountain n
 ```
 Mountain-NER/
 │
-├── dataset_creation.ipynb
-├── train.py
-├── inference.py
-├── mountain_ner_model/
-├── requirements.txt
-└── README.md
+├── notebooks/
+│   ├── dataset_creation.ipynb
+│   └── demo_inference.ipynb
+│
+├── src/
+│   ├── train.py
+│   └── inference.py
+│
+├── mountain_ner_dataset.csv
+├── README.md
+└── requirements.txt
 ```
 
 - **dataset_creation.ipynb** – dataset generation and BIO annotation.
