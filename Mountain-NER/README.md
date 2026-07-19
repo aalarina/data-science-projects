@@ -43,9 +43,6 @@ The training pipeline includes:
 - fine-tuning for token classification;
 - evaluation using Precision, Recall, F1-score and Accuracy.
 
-**Why BERT?**
-The bert-base-cased model was selected because it provides strong baseline performance for token classification tasks while remaining lightweight enough for efficient fine-tuning within the scope of this project.
-
 ### 3. Inference
 
 During inference, the trained model predicts mountain names in arbitrary English text.
@@ -53,6 +50,20 @@ During inference, the trained model predicts mountain names in arbitrary English
 An additional post-processing step merges WordPiece fragments (for example, *E* + *##tna* → *Etna*) before displaying the final predictions.
 
 The project also provides HTML visualization that highlights detected mountain names together with confidence scores.
+
+---
+
+### Why BERT?
+
+The bert-base-cased model was selected because it provides strong baseline performance for token classification tasks while remaining lightweight enough for efficient fine-tuning within the scope of this project.
+
+---
+
+## Model Weights
+
+The fine-tuned model weights are available on Hugging Face:
+
+https://huggingface.co/aalarina/mountain_ner_model
 
 ---
 
@@ -73,14 +84,6 @@ Mountain-NER/
 ├── README.md
 └── requirements.txt
 ```
-
----
-
-## Model Weights
-
-The fine-tuned model weights are available on Hugging Face:
-
-https://huggingface.co/aalarina/mountain_ner_model
 
 ---
 
