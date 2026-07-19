@@ -11,14 +11,7 @@ This project presents a solution for seasonal satellite image matching using Sen
 ### Choice of Sentinel-2 True Color Images
 
 The original dataset contains multiple Sentinel-2 spectral bands. However, this project utilizes only the True Color Image (TCI) representation.
-
-The primary objective of the task is image matching rather than land cover classification or multispectral analysis. Since LoFTR is a feature matching model originally designed for RGB imagery, using TCI images provides a natural input format without requiring any architectural modifications.
-
-### Confidence-based filtering
-
-LoFTR produces a confidence score for every detected correspondence.
-
-Instead of accepting every predicted match, only correspondences above a predefined confidence threshold are retained.
+The goal of the task is to establish geometric correspondences rather than perform semantic or multispectral analysis. During preprocessing, TCI images are converted to grayscale before being passed to LoFTR. Consequently, additional spectral bands are not required, while the TCI product provides sufficient structural information for reliable feature matching.
 
 ## Solution Explanation
 
@@ -28,7 +21,7 @@ The proposed solution consists of four main stages.
 
 The project uses the **Deforestation in Ukraine** dataset from Kaggle.
 
-The dataset contains Sentinel-2 Level-1C satellite imagery acquired between **2016 and 2019**.
+The dataset contains Sentinel-2 satellite imagery acquired between **2016 and 2019**.
 
 Only **True Color Images (TCI)** stored as **JPEG2000 (.jp2)** files are used for matching.
 
@@ -37,14 +30,7 @@ https://www.kaggle.com/datasets/isaienkov/deforestation-in-ukraine
 
 ### Dataset preparation
 
-The dataset preparation pipeline performs the following steps:
-
-1. Locate all Sentinel-2 TCI images.
-2. Extract acquisition dates and Sentinel tile identifiers.
-3. Group images by Sentinel tile.
-4. Select seasonal image pairs separated by approximately **180 ± 30 days**.
-5. Copy the selected image pairs into a dedicated dataset directory.
-6. Store metadata for every image pair.
+The dataset was created by selecting Sentinel-2 images acquired over the same tile at different times of the year. For every Sentinel tile, acquisition dates were extracted from the image metadata, after which image pairs separated by approximately 180 ± 30 days were selected. The corresponding TCI images were then copied into a dedicated dataset directory together with metadata describing each image pair.
 
 Each prepared sample has the following structure:
 
@@ -77,23 +63,13 @@ The detected local correspondences are transformed into global image coordinates
 
 ### 4. Post-processing
 
-The resulting correspondences are filtered according to their confidence score.
-
-Only high-confidence matches are retained and visualized.
+The resulting correspondences are filtered according to their confidence score. Instead of accepting every predicted match, only correspondences above a predefined confidence threshold are retained.
 
 ---
 
 ## Why LoFTR?
 
-The pretrained **LoFTR Outdoor** model was selected for several reasons:
-
-- detector-free feature matching;
-- robustness to significant appearance changes;
-- state-of-the-art performance on outdoor image matching benchmarks;
-- publicly available pretrained weights;
-- suitability for large-scale satellite imagery without additional training.
-
-Unlike traditional feature detectors such as SIFT or ORB, LoFTR directly predicts dense correspondences using Transformer-based local feature aggregation, making it more robust to seasonal appearance variations.
+LoFTR was selected as the core matching algorithm due to its ability to provide reliable dense correspondences without requiring explicit feature detection. This detector-free formulation is uniquely suited for Sentinel-2 satellite image matching, where seasonal variations can drastically alter local textures and appearance. Furthermore, leveraging the official pretrained model keeps the pipeline clean and straightforward, enabling direct algorithm evaluation without additional training overhead.
 
 ---
 
@@ -215,7 +191,7 @@ Images are available in ```inference_demo.ipynb```.
 
 The proposed pipeline successfully matches Sentinel-2 images acquired during different seasons using the pretrained LoFTR Outdoor model.
 
-The experimental evaluation demonstrates that the model remains robust to seasonal appearance changes, including variations in vegetation, illumination, and partial snow cover, without requiring additional training or fine-tuning.
+The experimental evaluation demonstrates that the model remains robust to seasonal appearance changes, including variations in vegetation, illumination and partial snow cover, without requiring additional training or fine-tuning.
 
 The spring-to-summer image pair produced substantially more reliable correspondences than the winter-to-summer pair, which can be explained by the greater amount of visual texture and fewer homogeneous regions. In contrast, extensive snow cover reduces the number of distinctive features available for matching, leading to fewer high-confidence correspondences.
 
