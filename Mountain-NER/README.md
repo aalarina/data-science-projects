@@ -2,16 +2,9 @@
 
 ## Overview
 
-This project implements a Named Entity Recognition (NER) system for detecting mountain names in English text.
+This repository contains a complete Named Entity Recognition (NER) pipeline for extracting mountain names from English text.
 
-The solution covers the complete machine learning pipeline, including:
-- automatic dataset creation;
-- BIO annotation generation;
-- fine-tuning a pretrained BERT model;
-- model evaluation;
-- inference and visualization of predictions.
-
-The final model was fine-tuned using the Hugging Face Transformers library on a custom dataset created specifically for this task.
+The project demonstrates the entire workflow, from automatic dataset generation and BIO annotation to fine-tuning a pretrained BERT model and performing inference on unseen text. The trained model is capable of recognizing mountain names and highlighting detected entities within the input text.
 
 ---
 
@@ -55,7 +48,7 @@ The project also provides HTML visualization that highlights detected mountain n
 
 ### Why BERT?
 
-The bert-base-cased model was selected because it provides strong baseline performance for token classification tasks while remaining lightweight enough for efficient fine-tuning within the scope of this project.
+The pretrained **bert-base-cased** model was selected as the backbone of the Named Entity Recognition pipeline due to its strong performance on sequence labeling tasks, publicly available pretrained weights, compatibility with the Hugging Face ecosystem and its ability to achieve high accuracy after fine-tuning on relatively small annotated datasets.
 
 ---
 
