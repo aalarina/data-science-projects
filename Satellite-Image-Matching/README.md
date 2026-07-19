@@ -2,9 +2,7 @@
 
 ## Overview
 
-This project implements a satellite image matching pipeline for Sentinel-2 imagery using the pretrained **LoFTR** feature matching model.
-
-The objective is to identify reliable correspondences between two satellite images acquired during different seasons without additional model training.
+This project presents a solution for seasonal satellite image matching using Sentinel-2 imagery. The proposed approach employs the pretrained LoFTR feature matching model to establish reliable correspondences between images acquired at different times of the year without additional model training.
 
 ---
 
