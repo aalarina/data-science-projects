@@ -114,7 +114,7 @@ Satellite-Image-Matching/
 Clone the repository
 
 ```bash
-git clone [<repository_url>](https://github.com/aalarina/data-science-projects/main/Satellite-Image-Matching)
+git clone [https://github.com/aalarina/data-science-projects/blob/main/Satellite-Image-Matching](https://github.com/aalarina/data-science-projects/blob/main/Satellite-Image-Matching)
 
 cd Satellite-Image-Matching
 ```
