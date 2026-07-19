@@ -85,6 +85,20 @@ Only high-confidence matches are retained and visualized.
 
 ---
 
+# Why LoFTR?
+
+The pretrained **LoFTR Outdoor** model was selected for several reasons:
+
+- detector-free feature matching;
+- robustness to significant appearance changes;
+- state-of-the-art performance on outdoor image matching benchmarks;
+- publicly available pretrained weights;
+- suitability for large-scale satellite imagery without additional training.
+
+Unlike traditional feature detectors such as SIFT or ORB, LoFTR directly predicts dense correspondences using Transformer-based local feature aggregation, making it more robust to seasonal appearance variations.
+
+---
+
 ## Model weights
 
 The project uses the pretrained **LoFTR Outdoor** model available from Kornia.
@@ -102,17 +116,22 @@ Therefore, no manual download of the model weights is required.
 
 ---
 
-# Why LoFTR?
+## Project Structure
 
-The pretrained **LoFTR Outdoor** model was selected for several reasons:
-
-- detector-free feature matching;
-- robustness to significant appearance changes;
-- state-of-the-art performance on outdoor image matching benchmarks;
-- publicly available pretrained weights;
-- suitability for large-scale satellite imagery without additional training.
-
-Unlike traditional feature detectors such as SIFT or ORB, LoFTR directly predicts dense correspondences using Transformer-based local feature aggregation, making it more robust to seasonal appearance variations.
+```text
+Satellite-Image-Matching/
+│
+├── notebooks/
+│   ├── dataset_creation.ipynb     # Dataset preparation from Sentinel-2 images
+│   └── demo_inference.ipynb       # End-to-end inference demonstration
+│
+├── src/
+│   ├── algorithm.py               # LoFTR matching pipeline
+│   └── inference.py               # Visualization and inference utilities
+│
+├── README.md                      
+└── requirements.txt               # Python dependencies
+```
 
 ---
 
