@@ -130,7 +130,7 @@ Satellite-Image-Matching/
 │   └── inference.py               # Visualization and inference utilities
 │
 ├── README.md                      
-└── requirements.txt               # Python dependencies
+└── requirements.txt               
 ```
 
 ---
