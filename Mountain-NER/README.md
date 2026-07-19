@@ -58,26 +58,21 @@ The project also provides HTML visualization that highlights detected mountain n
 
 ## Project Structure
 
-```
+```text
 Mountain-NER/
 │
 ├── notebooks/
-│   ├── dataset_creation.ipynb
-│   └── demo_inference.ipynb
+│   ├── dataset_creation.ipynb   # dataset generation and BIO annotation
+│   └── demo_inference.ipynb     # inference examples
 │
 ├── src/
-│   ├── train.py
-│   └── inference.py
+│   ├── train.py                 # model fine-tuning
+│   └── inference.py             # prediction utilities
 │
-├── mountain_ner_dataset.csv
+├── mountain_ner_dataset.csv     # generated dataset
 ├── README.md
 └── requirements.txt
 ```
-
-- **dataset_creation.ipynb** – dataset generation and BIO annotation.
-- **train.py** – model fine-tuning and evaluation.
-- **inference.py** – prediction and HTML visualization.
-- **mountain_ner_model/** – trained model files.
 
 ---
 
