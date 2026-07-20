@@ -45,7 +45,7 @@ WEIGHT_DECAY = 0.01
 # Load tokenizer
 # --------------------------------------------------
 
-# Load the tokenizer corresponding to the pretrained BERT model.
+# Load the tokenizer corresponding to the pretrained BERT model
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
 
@@ -57,7 +57,7 @@ def tokenize_and_align_labels(examples):
     """
     Tokenize the input sentences and align BIO labels with BERT subword tokens.
 
-    Special tokens ([CLS], [SEP]) and continuation subword pieces receive
+    Special tokens ([CLS], [SEP]) and continuation subword pieces are assigned
     the label -100 so they are ignored during loss computation.
     """
 
@@ -69,9 +69,10 @@ def tokenize_and_align_labels(examples):
 
     labels = []
 
+    # Align BIO labels with the tokenized output
     for i, label in enumerate(examples["labels"]):
 
-        # Map each tokenized piece to its original word.
+        # Map each tokenized piece to its original word
         word_ids = tokenized_inputs.word_ids(batch_index=i)
 
         previous_word_idx = None
@@ -80,15 +81,15 @@ def tokenize_and_align_labels(examples):
 
         for word_idx in word_ids:
 
-            # Ignore special tokens.
+            # Ignore special tokens
             if word_idx is None:
                 label_ids.append(-100)
 
-            # Assign the label only to the first subword.
+            # Assign the label only to the first subword
             elif word_idx != previous_word_idx:
                 label_ids.append(label[word_idx])
 
-            # Ignore remaining subword pieces.
+            # Ignore remaining subword pieces
             else:
                 label_ids.append(-100)
 
@@ -117,7 +118,7 @@ print("Tokenization completed successfully.")
 # Load model
 # --------------------------------------------------
 
-# Load the pretrained BERT model for token classification.
+# Load the pretrained BERT model for token classification
 model = AutoModelForTokenClassification.from_pretrained(
     MODEL_NAME,
     num_labels=len(label_list),
@@ -130,7 +131,7 @@ model = AutoModelForTokenClassification.from_pretrained(
 # Data collator
 # --------------------------------------------------
 
-# Dynamically pad batches during training.
+# Dynamically pad tokenized batches for token classification
 data_collator = DataCollatorForTokenClassification(
     tokenizer=tokenizer
 )
@@ -140,7 +141,7 @@ data_collator = DataCollatorForTokenClassification(
 # Evaluation metric
 # --------------------------------------------------
 
-# Load the seqeval metric for NER evaluation.
+# Load the seqeval metric for NER evaluation
 metric = evaluate.load("seqeval")
 
 
@@ -165,7 +166,7 @@ def compute_metrics(eval_pred):
         for pred, lab in zip(prediction, label):
 
             # Ignore labels assigned to special tokens
-            # and subword continuations.
+            # and subword continuations
             if lab != -100:
 
                 current_predictions.append(
@@ -200,7 +201,7 @@ training_args = TrainingArguments(
 
     output_dir=OUTPUT_DIR,
 
-    # Evaluate and save the model after every epoch.
+    # Evaluate and save the model after every epoch
     eval_strategy="epoch",
     save_strategy="epoch",
 
@@ -213,7 +214,7 @@ training_args = TrainingArguments(
 
     weight_decay=WEIGHT_DECAY,
 
-    # Restore the checkpoint with the best validation score.
+    # Restore the checkpoint with the best validation score
     load_best_model_at_end=True,
 
     logging_steps=10,
