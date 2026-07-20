@@ -1,3 +1,10 @@
+"""
+Satellite Image Matching
+
+This script loads an image pair from the prepared dataset,
+filters the detected correspondences and visualizes the final feature matches
+"""
+
 # ==================================================
 # Imports
 # ==================================================
