@@ -44,12 +44,13 @@ def merge_subwords(predictions):
 
     for pred in predictions:
 
+        # Merge continuation tokens with the previous prediction
         if pred["word"].startswith("##") and merged:
 
             merged[-1]["word"] += pred["word"][2:]
             merged[-1]["end"] = pred["end"]
 
-            # mean confidence
+            # Update the confidence score using the mean value
             merged[-1]["score"] = (
                 merged[-1]["score"] + pred["score"]
             ) / 2
@@ -70,6 +71,7 @@ def predict(text):
     Detect mountain names in the input text.
     """
 
+    # Run inference and merge fragmented WordPiece predictions
     predictions = merge_subwords(ner(text))
 
     if not predictions:
@@ -78,6 +80,7 @@ def predict(text):
 
     print("Detected mountains:")
 
+    # Print each detected mountain together with its confidence score
     for entity in predictions:
 
         print(
@@ -94,16 +97,19 @@ def highlight_mountains(text):
     """
     Highlight detected mountain names in HTML.
     """
-  
+
+    # Run inference and merge fragmented WordPiece predictions
     predictions = merge_subwords(ner(text))
 
     html_text = text
 
+    # Process entities in reverse order to preserve character indices
     for entity in sorted(predictions, key=lambda x: x["start"], reverse=True):
 
         start = entity["start"]
         end = entity["end"]
 
+        # Extract the original text span
         word = text[start:end]
 
         highlighted = f"""
@@ -120,12 +126,14 @@ def highlight_mountains(text):
         </span>
         """
 
+        # Replace the original entity with the highlighted HTML snippet
         html_text = (
             html_text[:start]
             + highlighted
             + html_text[end:]
         )
 
+    # Display the formatted HTML output
     display(HTML(f"""
     <div style="
         font-size:18px;
@@ -138,6 +146,11 @@ def highlight_mountains(text):
         {html_text}
     </div>
     """))
+
+
+# ==================================================
+# Example
+# ==================================================
 
 if __name__ == "__main__":
     text = ("We climbed Mount Everest before visiting Mount Fuji and Mount Etna.")
