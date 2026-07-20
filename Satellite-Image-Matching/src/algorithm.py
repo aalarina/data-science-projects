@@ -9,6 +9,11 @@ Pipeline:
 5. Merge all matches.
 """
 
+
+# ==================================================
+# Imports
+# ==================================================
+
 from pathlib import Path
 
 import cv2
@@ -25,20 +30,22 @@ import tqdm
 
 def read_rgb(image_path):
     """
-    Read Sentinel-2 RGB image (TCI.jp2).
+    Read Sentinel-2 image (TCI.jp2).
 
     Parameters
     ----------
-    image_path --- Path to the RGB Sentinel-2 image.
+    image_path --- Path to the Sentinel-2 image.
 
     Returns
     -------
     numpy.ndarray --- RGB image as uint8 numpy array.
     """
 
+    # Read the image in (bands, height, width) format
     with rasterio.open(image_path) as src:
         image = src.read()
 
+    # Convert from (bands, height, width) to (height, width, channels)
     image = np.moveaxis(image, 0, -1)
 
     return image
@@ -73,10 +80,13 @@ def split_into_tiles(image, tile_size=1024):
 
     tiles = []
 
+    # Iterate over the image using a regular tile grid
     for y in range(0, h - tile_size + 1, tile_size):
 
         for x in range(0, w - tile_size + 1, tile_size):
 
+            # Store each tile together with its position
+            # in the original image
             tiles.append({
                 "image": image[y:y+tile_size, x:x+tile_size],
                 "x": x,
@@ -121,7 +131,7 @@ def match_single_tile(tileA, tileB, matcher, device):
     Parameters
     ----------
     tileA --- First RGB tile.
-    tileB ---Second RGB tile.
+    tileB --- Second RGB tile.
     matcher --- Initialized LoFTR model.
     device --- Device used for inference.
 
@@ -130,15 +140,18 @@ def match_single_tile(tileA, tileB, matcher, device):
     dict --- Dictionary containing LoFTR correspondences.
     """
 
+    # Convert RGB tiles to grayscale, as required by LoFTR
     grayA = cv2.cvtColor(tileA, cv2.COLOR_RGB2GRAY)
     grayB = cv2.cvtColor(tileB, cv2.COLOR_RGB2GRAY)
 
+    # Convert images to normalized PyTorch tensors
     tensorA = torch.from_numpy(grayA).float() / 255.
     tensorA = tensorA.unsqueeze(0).unsqueeze(0).to(device)
 
     tensorB = torch.from_numpy(grayB).float() / 255.
     tensorB = tensorB.unsqueeze(0).unsqueeze(0).to(device)
 
+    # Run inference without computing gradients
     with torch.no_grad():
 
         correspondences = matcher({
@@ -180,6 +193,7 @@ def match_all_tiles(tilesA, tilesB, matcher, device):
     all_keypoints1 = []
     all_confidence = []
 
+    # Process each pair of corresponding tiles independently
     for tileA, tileB in tqdm(
             zip(tilesA, tilesB),
             total=len(tilesA),
@@ -192,6 +206,7 @@ def match_all_tiles(tilesA, tilesB, matcher, device):
             device
         )
 
+        # Convert LoFTR outputs from PyTorch tensors to NumPy arrays
         kp0 = correspondences["keypoints0"].cpu().numpy()
         kp1 = correspondences["keypoints1"].cpu().numpy()
         conf = correspondences["confidence"].cpu().numpy()
@@ -213,6 +228,7 @@ def match_all_tiles(tilesA, tilesB, matcher, device):
         all_keypoints1.append(kp1)
         all_confidence.append(conf)
 
+    # Merge correspondences from all image tiles
     keypoints0 = np.concatenate(all_keypoints0)
     keypoints1 = np.concatenate(all_keypoints1)
     confidence = np.concatenate(all_confidence)
